@@ -1,6 +1,6 @@
 # MidnightHype
 
-To install, all you have to do is copy through a Git Bash using this command inside your Git Bash: `git clone https://github.com/KidOfEpicness/MidnightHype.git`
+To install, all you have to do is copy through a Git Bash using this command inside your Git Bash: ```git clone https://github.com/KidOfEpicness/MidnightHype.git```
 
 
 Once installed, make sure you have a copy of Node.JS v6.0+ Installed on your computer, Now you need to fill out the config.json

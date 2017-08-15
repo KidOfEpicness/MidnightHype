@@ -5,7 +5,7 @@ To install, all you have to do is copy through a Git Bash using this command ins
 
 
 
-Once installed, make sure you have a copy of Node.JS v6.0+ Installed on your computer, First, you need to open a Git Bash inside that golder and type `npm install discord.js` Now you need to fill out the config.json
+Once installed, make sure you have a copy of Node.JS v6.0+ Installed on your computer, First, you need to open a Git Bash inside that folder and type `npm install discord.js` Now you need to fill out the config.json
 inside the folder, so get your token from https://discordapp.com/developers/applications/me, and place this inside the speech marks ("token") that
 are inside your config.json, now you need your ID, Go to discord and right click your name anywhere (a message, or on the right) and click
 "Copy ID", if you dont see this, click User Settings, then click appearence, and make sure "Developer Mode" is activated, Once it is Try

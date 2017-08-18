@@ -1,7 +1,8 @@
 const Discord = require('discord.js');
-const bot = new Discord.Client();
+const client = new Discord.Client();
 const config = require("./config.json");
 const fs = require('fs')
+
 
 function Role(mem, role) {
   return mem.roles.some(r=> r.name.toLowerCase() === role.toLowerCase());
@@ -21,7 +22,7 @@ function addRole(role) {
 }
 
 function uptime() {
-    var date = new Date(bot.uptime);
+    var date = new Date(client.uptime);
     var strDate = '';
     strDate += date.getUTCDate() - 1 + " days, ";
     strDate += date.getUTCHours() + " hours, ";
@@ -30,24 +31,25 @@ function uptime() {
     return strDate;
 }
 
-bot.on('ready', () => {
-  console.log(`Ready to begin serving in `  + bot.guilds.size + ` servers!`);
-  bot.user.setGame(bot.guilds.size + ' servers | ' + config.prefix + 'help.');
+
+client.on('ready', () => {
+  console.log(`Ready to begin serving in `  + client.guilds.size + ` servers!`);
+   client.user.setPresence({ game: { name: client.guilds.size + ' servers | ' + config.prefix + 'help', type: 0 } });
 });
 
-bot.on("disconnected", function () {
+client.on("disconnected", function () {
 	console.log("Disconnected!");
 });
 
-bot.on('guildCreate', guild => {
-  bot.user.setGame(bot.guilds.size + ' servers | ' + config.prefix + 'help.');
+client.on('guildCreate', guild => {
+   client.user.setPresence({ game: { name: client.guilds.size + ' servers | ' + config.prefix + 'help', type: 0 } });
 });
 
-bot.on('guildpurge', guild => {
-  bot.user.setGame(bot.guilds.size + ' servers | ' + config.prefix + 'help.');
+client.on('guildpurge', guild => {
+   client.user.setPresence({ game: { name: client.guilds.size + ' servers | ' + config.prefix + 'help', type: 0 } });
 });
 
-bot.on('message', message => {
+client.on('message', message => {
   var args = message.content.split(/[ ]/)
   if(message.author.bot) return;
   if (message.channel.type == "dm") return;
@@ -56,13 +58,12 @@ bot.on('message', message => {
   command = command.toLowerCase().slice(config.prefix.length);
 
 if(!message.content.startsWith(config.prefix)) return;
-/*
 
 if(command === "mute") {
   if(args[0].length > 4 + config.prefix.length) return;
   if(Role(message.member, "Bot Commander") || message.author.id !== config.owner) {
     if(message.isMentioned("298201021224714241")) {
-      return message.channel.sendMessage('KidsBot cannot mute itself. Usage: `' + `${config.prefix}mute <@User to mute>` + '`').catch(console.error);
+      return message.channel.sendMessage('Midnight Hype cannot mute itself. Usage: `' + `${config.prefix}mute <@User to mute>` + '`').catch(console.error);
     }
     if(message.mentions.users.size === 0) {
       return message.channel.sendMessage('You did not Mention a user to mute. Usage: `' + `${config.prefix}mute <@User to mute>` + '`').catch(console.error);
@@ -92,7 +93,7 @@ if(command === "mute") {
   } else {
     message.channel.sendMessage('You dont have the `Bot Commander` role ' ).catch(console.error);
   }
-} else */
+} else
 
 if(command === "shutdown") {
   if(message.content.length > 8 + config.prefix.length) return;
@@ -151,13 +152,13 @@ if(command === "say") {
      if(args[0].length > 4 + config.prefix.length) return;
      if(Role(message.member, "Bot Commander") || message.author.id !== config.owner) {
        if(message.isMentioned("29820102122471424")) {
-         return message.channel.sendMessage('KidsBot cannot kick itself!. Usage: `' + `${config.prefix}kick <@User to kick>` + '`').catch(console.error);
+         return message.channel.sendMessage('Midnight Hype cannot kick itself!. Usage: `' + `${config.prefix}kick <@User to kick>` + '`').catch(console.error);
        }
        if(message.isMentioned("224632668187394048")) {
-         return message.channel.sendMessage('KidsBot cannot kick its creator!. Usage: `' + `${config.prefix}kick <@User to kick>` + '`').catch(console.error);
+         return message.channel.sendMessage('Midnight Hype cannot kick its creator!. Usage: `' + `${config.prefix}kick <@User to kick>` + '`').catch(console.error);
        }
        if(message.isMentioned("244958092909871107")) {
-         return message.channel.sendMessage('KidsBot cannot kick its creator!. Usage: `' + `${config.prefix}kick <@User to kick>` + '`').catch(console.error);
+         return message.channel.sendMessage('Midnight Hype cannot kick its creator!. Usage: `' + `${config.prefix}kick <@User to kick>` + '`').catch(console.error);
        }
        if(message.mentions.users.size === 0) {
          return message.channel.sendMessage('You did not Mention a user to kick. Usage: `' + `${config.prefix}kick <@User to Kick>` + '`').catch(console.error);
@@ -175,7 +176,7 @@ if(command === "say") {
        if(!kickMember) {
          return message.channel.sendMessage('That user is not Valid');
        }
-       if(!message.guild.member(bot.user).hasPermission(0x00000002)) {
+       if(!message.guild.member(client.user).hasPermission(0x00000002)) {
          return message.channel.sendMessage('I dont have the permission `KICK_MEMBERS` to do this.').catch(console.error);
        } else {
        kickMember.kick().then(member => {
@@ -191,16 +192,16 @@ if(command === "say") {
      if(args[0].length > 3 + config.prefix.length) return;
      if(Role(message.member, "Bot Commander") || message.author.id !== config.owner) {
        if(message.isMentioned("291015751752613892")) {
-         return message.channel.sendMessage("KidsBot cannot ban itself. Usage: `" + `${config.prefix}ban <@User to ban>` + '`').catch(console.error);
+         return message.channel.sendMessage("Midnight Hype cannot ban itself. Usage: `" + `${config.prefix}ban <@User to ban>` + '`').catch(console.error);
        }
        if(message.isMentioned("224632668187394048")) {
-         return message.channel.sendMessage('KidsBot cannot ban its creator!. Usage: `' + `${config.prefix}ban <@User to ban>` + '`').catch(console.error);
+         return message.channel.sendMessage('Midnight Hype cannot ban its creator!. Usage: `' + `${config.prefix}ban <@User to ban>` + '`').catch(console.error);
        }
        if(message.isMentioned("244958092909871107")) {
-         return message.channel.sendMessage('KidsBot cannot ban its creator!. Usage: `' + `${config.prefix}ban <@User to ban>` + '`').catch(console.error);
+         return message.channel.sendMessage('Midnight Hype cannot ban its creator!. Usage: `' + `${config.prefix}ban <@User to ban>` + '`').catch(console.error);
        }
        if(message.isMentioned("227177798303875073")) {
-         return message.channel.sendMessage('KidsBot cannot ban its creator!. Usage: `' + `${config.prefix}ban <@User to ban>` + '`').catch(console.error);
+         return message.channel.sendMessage('Midnight Hype cannot ban its creator!. Usage: `' + `${config.prefix}ban <@User to ban>` + '`').catch(console.error);
        }
        if(message.mentions.users.size === 0) {
          return message.channel.sendMessage('You did not Mention a user to ban. Usage: `' + `${config.prefix}ban <@User to ban>` + '`').catch(console.error);
@@ -212,7 +213,7 @@ if(command === "say") {
        if(!banMember) {
          return message.channel.sendMessage('That user is not Valid');
        }
-       if(!message.guild.member(bot.user).hasPermission(0x00000004)) {
+       if(!message.guild.member(client.user).hasPermission(0x00000004)) {
          return message.channel.sendMessage('I dont have the permission `BAN_MEMBERS` to do this.').catch(console.error);
        }
        banMember.ban().then(member => {
@@ -228,16 +229,16 @@ if(command === "say") {
      if(args[0].length > 4 + config.prefix.length) return;
      if(Role(message.member, "Bot Commander") || message.author.id !== config.owner) {
        if(message.isMentioned("298201021224714241")) {
-         return message.channel.sendMessage('KidsBot cannot warn itself. Usage: `' + `${config.prefix}warn <@User to warn> <reason>` + '`').catch(console.error);
+         return message.channel.sendMessage('Midnight Hype cannot warn itself. Usage: `' + `${config.prefix}warn <@User to warn> <reason>` + '`').catch(console.error);
        }
        if(message.isMentioned("224632668187394048")) {
-         return message.channel.sendMessage('KidsBot cannot warn its creator!. Usage: `' + `${config.prefix}warn <@User to warn> <reason>` + '`').catch(console.error);
+         return message.channel.sendMessage('Midnight Hype cannot warn its creator!. Usage: `' + `${config.prefix}warn <@User to warn> <reason>` + '`').catch(console.error);
        }
        if(message.isMentioned("227177798303875073")) {
-         return message.channel.sendMessage('KidsBot cannot warn its creator!. Usage: `' + `${config.prefix}warn <@User to warn> <reason>` + '`').catch(console.error);
+         return message.channel.sendMessage('Midnight Hype cannot warn its creator!. Usage: `' + `${config.prefix}warn <@User to warn> <reason>` + '`').catch(console.error);
        }
        if(message.isMentioned("244958092909871107")) {
-         return message.channel.sendMessage('KidsBot cannot warn its creator!. Usage: `' + `${config.prefix}warn <@User to warn> <reason>` + '`').catch(console.error);
+         return message.channel.sendMessage('Midnight Hype cannot warn its creator!. Usage: `' + `${config.prefix}warn <@User to warn> <reason>` + '`').catch(console.error);
        }
        if(message.mentions.users.size === 0) {
          return message.channel.sendMessage('You did not Mention a user to warn. Usage: `' + `${config.prefix}warn <@User to warn> <reason>` + '`').catch(console.error);
@@ -266,6 +267,20 @@ if(command === "say") {
      } else {
        message.channel.sendMessage('You dont have the `Bot Commander` role ' ).catch(console.error);
      }
+   } else
+
+   if(command === "report") {
+     if(args[0].length > 6 + config.prefix.length) return;
+       if(args.length === 1) {
+         message.channel.sendMessage('You did not define any arguments. Usage: `' + `${config.prefix}report . <message>` + '`').catch(console.error);
+       } else {
+         if(args.slice(2).join(' ').length === 0) {
+           message.channel.sendMessage('You have not given a message for my support team!. Usage: `' + `${config.prefix}report . <message>` + '` (if you put a 1 word message, just put a dot then a space then your message, theres a glitch in discord.js causing that to happen)').catch(console.error);
+         } else {
+           message.channel.sendMessage('I have sent the report ` ' + args.slice(2).join(' ') + ' ` to my support team!');
+           client.channels.get('324723677461610497').sendMessage("<@&324721974590963716> we have a new report from " + message.member + ', ` ' + args.slice(2).join(' ') + ' ` good luck!').catch(console.error)
+         }
+        }
    } else
 
    if(command === "hug") {
@@ -520,18 +535,23 @@ if(command === "say") {
 
    if(command === "mytime") {
      if(message.content.length > 6 + config.prefix.length) return;
-     message.channel.sendMessage(Date(bot.uptime)).catch(console.error);
+     message.channel.sendMessage(Date(client.uptime)).catch(console.error);
    } else
 
    if(command === "agree") {
      if(message.content.length > 5 + config.prefix.length) return;
-     message.channel.sendMessage(message.member.user + ' has agreed to the rules and to stay active in this server. Timestamped: `' + (Date(bot.uptime)) + '`');
+     message.channel.sendMessage(message.member.user + ' has agreed to the rules and to stay active in this server. Timestamped: `' + (Date(client.uptime)) + '`');
    } else
 
    if(command === "hi") {
      if(message.content.length > 2 + config.prefix.length) return;
      message.channel.sendMessage('Hello, ' + message.author.username).catch(console.error);
    } else
+
+   if(command === "globalmembers") {
+     if(message.content.length > 13 + config.prefix.length) return;
+     message.channel.sendMessage(`I am used by ${client.guilds.reduce((p, c) => p + c.memberCount, 0)} people!`)
+   }
 
    if(command === "liar") {
      if(message.content.length > 4 + config.prefix.length) return;
@@ -546,7 +566,7 @@ if(command === "say") {
 /*   if(command === "name") {
      if(message.content.length > 4 + config.prefix.length) return;
      if(message.author.id !== config.owner)
-     bot.user.setUsername('Midnight Hype')
+     client.user.setUsername('Midnight Hype')
       .then(user => console.log(`My new username is ${user.username}`))
       .catch(console.error);
    } else */
@@ -598,7 +618,7 @@ if(command === "say") {
 
    if(command === "sinvite") {
      if(message.content.length > 7 +config.prefix.length) return;
-     message.channel.sendmessage('I see you want an invite. Here is an invite ' + bot.guild.fetchInvite() + ', enjoy!').catch(console.error);
+     message.channel.sendmessage('I see you want an invite. Here is an invite ' + client.guild.fetchInvite() + ', enjoy!').catch(console.error);
    } else
 
    if(command === "hey") {
@@ -625,7 +645,7 @@ if(command === "say") {
      description: "Do you want to know what my updates are?",
      fields: [{
          name: "My updates are: ",
-         value: "**most commands are now shown in an embed and i am getting some new commands, check ;;help to see them**"
+         value: "**most commands are now shown in an embed and i am getting some new commands, check ;;cmds to see them**"
        }],
          timestamp: new Date(),
      footer: {
@@ -703,7 +723,7 @@ if(command === "avatar") {
      description: "This tells you my ping!",
      fields: [{
          name: "My message response latency is:",
-         value: `${message.createdTimestamp - message.createdTimestamp}ms. API Latency is ${Math.round(bot.ping)}ms`
+         value: `${message.createdTimestamp - message.createdTimestamp}ms. API Latency is ${Math.round(client.ping)}ms`
        }],
          timestamp: new Date(),
      footer: {
@@ -714,11 +734,11 @@ if(command === "avatar") {
  }));
   }
 
-//`Pong! Latency is ${message.createdTimestamp - message.createdTimestamp}ms. API Latency is ${Math.round(bot.ping)}ms`
+//`Pong! Latency is ${message.createdTimestamp - message.createdTimestamp}ms. API Latency is ${Math.round(client.ping)}ms`
 
 
   if(command === "ping") {
-    if(message.content.length > 3 + config.prefix.length) return;
+    if(message.content.length > 4 + config.prefix.length) return;
     message.channel.sendMessage({embed: {
     color: 3447003,
     author: {
@@ -730,7 +750,7 @@ if(command === "avatar") {
     description: "This tells you my ping!",
     fields: [{
         name: "My ping is:",
-        value: "**" + bot.ping + " ms!**"
+        value: "**" + client.ping + " ms!**"
       }],
         timestamp: new Date(),
     footer: {
@@ -787,17 +807,17 @@ if(command === "avatar") {
 });
   }
 
-    if(command === "help")
-    message.channel.sendMessage(message.member.user + ', Please check your DMs :incoming_envelope:').then(m => {
+    if(command === "help") {
+    message.channel.sendMessage(message.member.user + ', Please check your DMs :incoming_envelope:')
     message.author.send(`***Commands:***
     \`\`\`
-    ${config.prefix}hi, hey, hallo - Says Hello to KidsBot
+    ${config.prefix}hi, hey, hallo - Says Hello to Midnight Hype
     ${config.prefix}ping - PONG
     ${config.prefix}membercount - Displays the total members of the server
-    ${config.prefix}servercount - Displays the number of servers KidsBot is running on
-    ${config.prefix}servers - Lists the servers KidsBot is on
-    ${config.prefix}invite - gives you the link to add the bot to your server!
-    ${config.prefix}server - Sends you a link to (Secondary Dev) RealClientMod || Tyler#5713's Server!
+    ${config.prefix}servercount - Displays the number of servers Midnight Hype is running on
+    ${config.prefix}servers - Lists the servers Midnight Hype is on
+    ${config.prefix}invite - gives you the link to add the client to your server!
+    ${config.prefix}server - Sends you a link to my creators server!
     ${config.prefix}creator - Tells you who made this bot!
     ${config.prefix}oliver - Gives you the link to an epic Instagram
     ${config.prefix}rcm - Surprise
@@ -813,11 +833,9 @@ if(command === "avatar") {
     ${config.prefix}ban <@user_to_ban> - Bans the mentioned user
     ${config.prefix}warn <@user to warn> <reason> - Sends the mentioned user a warning in Direct Message
     \`\`\`
-    ***If you have any other issues please contact me on:*** https://discord.gg/ztezxDh
-
-     ***Devs Server:*** https://discord.gg/hpd4dmz
+    ***If you have any other issues please contact me on:*** https://discord.gg/YKCWkua
     `);
-    });
+    };
 
       if(command === "invite") {
         if(message.content.length > 6 + config.prefix.length) return;
@@ -828,11 +846,11 @@ if(command === "avatar") {
           icon_url: message.author.avatarURL
         },
         title: "You wanna invite me?",
-        url: "https://discordapp.com/oauth2/authorize?client_id=291015751752613892&scope=bot&permissions=8",
+        url: "https://discordapp.com/oauth2/authorize?client_id=291015751752613892&scope=client&permissions=8",
         description: "ok, i'll give you my invite link!",
         fields: [{
             name: "My invite link is:",
-            value: "**" + config.invite + "**",
+            value: "**https://discordapp.com/oauth2/authorize?client_id=291015751752613892&scope=client&permissions=8**",
           }],
             timestamp: new Date(),
         footer: {
@@ -872,6 +890,10 @@ if(command === "avatar") {
      message.channel.sendMessage(message.member.user + ' just hugged ' + message.mentions.users.first()).catch(console.error);
    }
 
+   if(command === "servers") {
+     if(message.content.length > 7 + config.prefix.length) return;
+     message.channel.sendMessage(client.guilds.map(g => "`" + `${g.name} | ${g.memberCount}` + "`")).catch(console.error);
+   } else
 
       if(command === "cookie") {
         if(message.content.length > 6 + config.prefix.length) return;
@@ -881,7 +903,7 @@ if(command === "avatar") {
 
       if(command === "servercount") {
          if(message.content.length > 11 + config.prefix.length) return;
-         message.channel.sendMessage('Total Server Count: `' + bot.guilds.size + '`').catch(console.error);
+         message.channel.sendMessage('Total Server Count: `' + client.guilds.size + '`').catch(console.error);
        }
 
        if(command === "membercount") {
@@ -891,4 +913,4 @@ if(command === "avatar") {
   });
 
 
-bot.login(config.token);
+client.login(config.token);

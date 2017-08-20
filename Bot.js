@@ -1,5 +1,5 @@
 //If you edit this, removing my credit from the bot will void the license, so leave credit in or you will be holding an illegal copy of this bot
-
+//if you are not editing, you may ignore this
 const Discord = require('discord.js');
 const client = new Discord.Client();
 const config = require("./config.json");

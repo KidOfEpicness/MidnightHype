@@ -9,4 +9,7 @@ You will be able to order food soon!, the command will be ;;order, all you will 
 Kitchen a message telling them what you ordered, if we are able to make what you ordered, we will, if we cannot, then sadly, your order
 will be denied
 
+**Music!**
+Yep, The next update will incude music! check your help command for the music commands when you get it!
+
 **Nothing else for now folks, keep checking the Discord to see any new commits**

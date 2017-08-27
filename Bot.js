@@ -6,7 +6,7 @@ const config = require("./config.json");
 const fs = require('fs');
 const music = require('discord.js-music-v11')
 music(client, {
-	prefix: ';;',        // Prefix of '-'.
+	prefix: `${config.prefix}`,        // Prefix of '-'.
 	global: false,      // Server-specific queues.
 	maxQueueSize: 100,   // Maximum queue size of 10.
 	clearInvoker: false, // If permissions applicable, allow the bot to delete the messages that invoke it (start with prefix)

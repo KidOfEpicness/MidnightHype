@@ -4,7 +4,7 @@ const ytdl = require('ytdl-core');
 /**
  * Takes a discord.js client and turns it into a music bot.
  * Thanks to 'derekmartinez18' for helping.
- * 
+ *
  * @param {Client} client - The discord.js client.
  * @param {object} options - (Optional) Options to configure the music bot. Acceptable options are:
  * 							prefix: The prefix to use for the commands (default '!').
@@ -18,9 +18,9 @@ module.exports = function (client, options) {
 	// Get all options.
 	let PREFIX = (options && options.prefix) || '!';
 	let GLOBAL = (options && options.global) || false;
-	let MAX_QUEUE_SIZE = (options && options.maxQueueSize) || 20;
+	let MAX_QUEUE_SIZE = (options && options.maxQueueSize) || 1000;
 	let DEFAULT_VOLUME = (options && options.volume) || 50;
-	let ALLOW_ALL_SKIP = (options && options.anyoneCanSkip) || false;
+	let ALLOW_ALL_SKIP = (options && options.anyoneCanSkip) || true;
 	let CLEAR_INVOKER = (options && options.clearInvoker) || false;
 
 	// Create an object of queues.
@@ -29,7 +29,6 @@ module.exports = function (client, options) {
 	// Catch message events.
 	client.on('message', msg => {
 		const message = msg.content.trim();
-
 		// Check if the message is a command.
 		if (message.toLowerCase().startsWith(PREFIX.toLowerCase())) {
 			// Get the command and suffix.
@@ -63,9 +62,9 @@ module.exports = function (client, options) {
 
 	/**
 	 * Checks if a user is an admin.
-	 * 
+	 *
 	 * @param {GuildMember} member - The guild member
-	 * @returns {boolean} - 
+	 * @returns {boolean} -
 	 */
 	function isAdmin(member) {
 		return member.hasPermission("ADMINISTRATOR");
@@ -73,7 +72,7 @@ module.exports = function (client, options) {
 
 	/**
 	 * Checks if the user can skip the song.
-	 * 
+	 *
 	 * @param {GuildMember} member - The guild member
 	 * @param {array} queue - The current queue
 	 * @returns {boolean} - If the user can skip
@@ -87,8 +86,8 @@ module.exports = function (client, options) {
 
 	/**
 	 * Gets the song queue of the server.
-	 * 
-	 * @param {integer} server - The server id. 
+	 *
+	 * @param {integer} server - The server id.
 	 * @returns {object} - The song queue.
 	 */
 	function getQueue(server) {
@@ -102,28 +101,46 @@ module.exports = function (client, options) {
 
 	/**
 	 * The command for adding a song to the queue.
-	 * 
+	 *
 	 * @param {Message} msg - Original message.
 	 * @param {string} suffix - Command suffix.
 	 * @returns {<promise>} - The response edit.
 	 */
 	function play(msg, suffix) {
 		// Make sure the user is in a voice channel.
-		if (msg.member.voiceChannel === undefined) return msg.channel.sendMessage(wrap('You\'re not in a voice channel.'));
+		if (msg.member.voiceChannel === undefined) return msg.channel.send(wrap('You\'re not in a voice channel.'));
 
 		// Make sure the suffix exists.
-		if (!suffix) return msg.channel.sendMessage(wrap('No video specified!'));
+		if (!suffix) return msg.channel.send(wrap('No video specified!'));
 
 		// Get the queue.
 		const queue = getQueue(msg.guild.id);
 
 		// Check if the queue has reached its maximum size.
 		if (queue.length >= MAX_QUEUE_SIZE) {
-			return msg.channel.sendMessage(wrap('Maximum queue size reached!'));
+			return msg.channel.send(wrap('Maximum queue size reached!'));
 		}
 
 		// Get the video information.
-		msg.channel.sendMessage(wrap('Searching...')).then(response => {
+		msg.channel.send({embed: {
+		color: 3447003,
+		author: {
+			name: msg.author.user,
+			icon_url: msg.author.avatarURL
+		},
+		title: `${msg.author.username}`,
+		description: `has requested a song`,
+		fields: [{
+				name: "Searching for",
+				value: `**${suffix}**`
+			}],
+				timestamp: new Date(),
+		footer: {
+			icon_url: msg.author.avatarURL,
+			text: msg.author.username + ` is epic`
+		}
+		}
+		}).then(response => {
 			var searchstring = suffix
 			if (!suffix.toLowerCase().startsWith('http')) {
 				searchstring = 'gvsearch1:' + suffix;
@@ -138,7 +155,25 @@ module.exports = function (client, options) {
 				info.requester = msg.author.id;
 
 				// Queue the video.
-				response.edit(wrap('Queued: ' + info.title)).then(() => {
+				response.edit({embed: {
+				color: 3447003,
+				author: {
+					name: msg.author.user,
+					icon_url: msg.author.avatarURL
+				},
+				title: `${msg.author.username}`,
+				description: `has requested a song to be queued`,
+				fields: [{
+						name: "Queued",
+						value: `**${info.title}**`
+					}],
+						timestamp: new Date(),
+				footer: {
+					icon_url: msg.author.avatarURL,
+					text: msg.author.username + ` is epic`
+				}
+			}
+		}).then(() => {
 					queue.push(info);
 					// Play if only one element in the queue.
 					if (queue.length === 1) executeQueue(msg, queue);
@@ -150,7 +185,7 @@ module.exports = function (client, options) {
 
 	/**
 	 * The command for skipping a song.
-	 * 
+	 *
 	 * @param {Message} msg - Original message.
 	 * @param {string} suffix - Command suffix.
 	 * @returns {<promise>} - The response message.
@@ -158,12 +193,12 @@ module.exports = function (client, options) {
 	function skip(msg, suffix) {
 		// Get the voice connection.
 		const voiceConnection = client.voiceConnections.find(val => val.channel.guild.id == msg.guild.id);
-		if (voiceConnection === null) return msg.channel.sendMessage(wrap('No music being played.'));
+		if (voiceConnection === null) return msg.channel.send(wrap('No music being played.'));
 
 		// Get the queue.
 		const queue = getQueue(msg.guild.id);
 
-		if (!canSkip(msg.member, queue)) return msg.channel.sendMessage(wrap('You cannot skip this as you didn\'t queue it.')).then((response) => {
+		if (!canSkip(msg.member, queue)) return msg.channel.send(wrap('You cannot skip this as you didn\'t queue it.')).then((response) => {
 			response.delete(5000);
 		});
 
@@ -182,12 +217,12 @@ module.exports = function (client, options) {
 		if (voiceConnection.paused) dispatcher.resume();
 		dispatcher.end();
 
-		msg.channel.sendMessage(wrap('Skipped ' + toSkip + '!'));
+		msg.channel.send(wrap('Skipped ' + toSkip + '!'));
 	}
 
 	/**
 	 * The command for listing the queue.
-	 * 
+	 *
 	 * @param {Message} msg - Original message.
 	 * @param {string} suffix - Command suffix.
 	 */
@@ -209,12 +244,12 @@ module.exports = function (client, options) {
 		}
 
 		// Send the queue and status.
-		msg.channel.sendMessage(wrap('Queue (' + queueStatus + '):\n' + text));
+		msg.channel.send(wrap('Queue (' + queueStatus + '):\n' + text));
 	}
 
 	/**
 	 * The command for pausing the current song.
-	 * 
+	 *
 	 * @param {Message} msg - Original message.
 	 * @param {string} suffix - Command suffix.
 	 * @returns {<promise>} - The response message.
@@ -222,20 +257,38 @@ module.exports = function (client, options) {
 	function pause(msg, suffix) {
 		// Get the voice connection.
 		const voiceConnection = client.voiceConnections.find(val => val.channel.guild.id == msg.guild.id);
-		if (voiceConnection === null) return msg.channel.sendMessage(wrap('No music being played.'));
+		if (voiceConnection === null) return msg.channel.send(wrap('No music being played.'));
 
 		if (!isAdmin(msg.member))
-			return msg.channel.sendMessage(wrap('You are not authorized to use this.'));
+			return msg.channel.send(wrap('You are not authorized to use this.'));
 
 		// Pause.
-		msg.channel.sendMessage(wrap('Playback paused.'));
+		msg.channel.send({embed: {
+		color: 3447003,
+		author: {
+			name: msg.author.user,
+			icon_url: msg.author.avatarURL
+		},
+		title: `${msg.author.username}`,
+		description: `has paused the song`,
+		fields: [{
+				name: "Song paused:",
+				value: `**${video.title}**`
+			}],
+				timestamp: new Date(),
+		footer: {
+			icon_url: msg.author.avatarURL,
+			text: msg.author.username + ` is epic`
+		}
+	}
+});
 		const dispatcher = voiceConnection.player.dispatcher;
 		if (!dispatcher.paused) dispatcher.pause();
 	}
 
 	/**
 	 * The command for leaving the channel and clearing the queue.
-	 * 
+	 *
 	 * @param {Message} msg - Original message.
 	 * @param {string} suffix - Command suffix.
 	 * @returns {<promise>} - The response message.
@@ -243,7 +296,7 @@ module.exports = function (client, options) {
 	function leave(msg, suffix) {
 		if (isAdmin(msg.member)) {
 			const voiceConnection = client.voiceConnections.find(val => val.channel.guild.id == msg.guild.id);
-			if (voiceConnection === null) return msg.channel.sendMessage(wrap('I\'m not in any channel!.'));
+			if (voiceConnection === null) return msg.channel.send(wrap('I\'m not in any channel!.'));
 			// Clear the queue.
 			const queue = getQueue(msg.guild.id);
 			queue.splice(0, queue.length);
@@ -252,13 +305,13 @@ module.exports = function (client, options) {
 			voiceConnection.player.dispatcher.end();
 			voiceConnection.disconnect();
 		} else {
-			msg.channel.sendMessage(wrap('You don\'t have permission to use that command!'));
+			msg.channel.send(wrap('You don\'t have permission to use that command!'));
 		}
 	}
 
 	/**
 	 * The command for clearing the song queue.
-	 * 
+	 *
 	 * @param {Message} msg - Original message.
 	 * @param {string} suffix - Command suffix.
 	 */
@@ -267,15 +320,15 @@ module.exports = function (client, options) {
 			const queue = getQueue(msg.guild.id);
 
 			queue.splice(0, queue.length);
-			msg.channel.sendMessage(wrap('Queue cleared!'));
+			msg.channel.send(wrap('Queue cleared!'));
 		} else {
-			msg.channel.sendMessage(wrap('You don\'t have permission to use that command!'));
+			msg.channel.send(wrap('You don\'t have permission to use that command!'));
 		}
 	}
 
 	/**
 	 * The command for resuming the current song.
-	 * 
+	 *
 	 * @param {Message} msg - Original message.
 	 * @param {string} suffix - Command suffix.
 	 * @returns {<promise>} - The response message.
@@ -283,20 +336,39 @@ module.exports = function (client, options) {
 	function resume(msg, suffix) {
 		// Get the voice connection.
 		const voiceConnection = client.voiceConnections.find(val => val.channel.guild.id == msg.guild.id);
-		if (voiceConnection === null) return msg.channel.sendMessage(wrap('No music being played.'));
+		if (voiceConnection === null) return msg.channel.send(wrap('No music being played.'));
 
 		if (!isAdmin(msg.member))
-			return msg.channel.sendMessage(wrap('You are not authorized to use this.'));
+			return msg.channel.send(wrap('You are not authorized to use this.'));
 
 		// Resume.
-		msg.channel.sendMessage(wrap('Playback resumed.'));
+		msg.channel.send({embed: {
+		color: 3447003,
+		author: {
+			name: msg.author.user,
+			icon_url: msg.author.avatarURL
+		},
+		title: `${msg.author.username}`,
+		description: `has resumed playback`,
+		fields: [{
+				name: "Resumed:",
+				value: `**${info.title}**`
+			}],
+				timestamp: new Date(),
+		footer: {
+			icon_url: msg.author.avatarURL,
+			text: msg.author.username + ` is epic`
+		}
+	}
+});
+
 		const dispatcher = voiceConnection.player.dispatcher;
 		if (dispatcher.paused) dispatcher.resume();
 	}
 
 	/**
 	 * The command for changing the song volume.
-	 * 
+	 *
 	 * @param {Message} msg - Original message.
 	 * @param {string} suffix - Command suffix.
 	 * @returns {<promise>} - The response message.
@@ -304,25 +376,25 @@ module.exports = function (client, options) {
 	function volume(msg, suffix) {
 		// Get the voice connection.
 		const voiceConnection = client.voiceConnections.find(val => val.channel.guild.id == msg.guild.id);
-		if (voiceConnection === null) return msg.channel.sendMessage(wrap('No music being played.'));
+		if (voiceConnection === null) return msg.channel.send(wrap('No music being played.'));
 
 		if (!isAdmin(msg.member))
-			return msg.channel.sendMessage(wrap('You are not authorized to use this.'));
+			return msg.channel.send(wrap('You are not authorized to use this.'));
 
 		// Get the dispatcher
 		const dispatcher = voiceConnection.player.dispatcher;
 
-		if (suffix > 200 || suffix < 0) return msg.channel.sendMessage(wrap('Volume out of range!')).then((response) => {
+		if (suffix > 200 || suffix < 0) return msg.channel.send(wrap('Volume out of range!')).then((response) => {
 			response.delete(5000);
 		});
 
-		msg.channel.sendMessage(wrap("Volume set to " + suffix));
+		msg.channel.send(wrap("Volume set to " + suffix));
 		dispatcher.setVolume((suffix/100));
 	}
 
 	/**
 	 * Executes the next song in the queue.
-	 * 
+	 *
 	 * @param {Message} msg - Original message.
 	 * @param {object} queue - The song queue for this server.
 	 * @returns {<promise>} - The voice channel.
@@ -330,7 +402,25 @@ module.exports = function (client, options) {
 	function executeQueue(msg, queue) {
 		// If the queue is empty, finish.
 		if (queue.length === 0) {
-			msg.channel.sendMessage(wrap('Playback finished.'));
+			msg.channel.send({embed: {
+			color: 3447003,
+			author: {
+				name: msg.author.user,
+				icon_url: msg.author.avatarURL
+			},
+			title: `${msg.author.username}`,
+			description: `Playback finished`,
+			fields: [{
+					name: "Song over",
+					value: `**Hey, why are you lookin' at me? I told you, the song is finished.**`
+				}],
+					timestamp: new Date(),
+			footer: {
+				icon_url: msg.author.avatarURL,
+				text: msg.author.username + ` is epic`
+			}
+		}
+	});
 
 			// Leave the voice channel.
 			const voiceConnection = client.voiceConnections.find(val => val.channel.guild.id == msg.guild.id);
@@ -360,10 +450,29 @@ module.exports = function (client, options) {
 			// Get the first item in the queue.
 			const video = queue[0];
 
-			console.log(video.webpage_url);
+			client.channels.get('356899284152614914').send(`${msg.author.username}#${msg.author.discriminator} has requested "${video.title}" to be played in ${msg.guild.name}`);
 
 			// Play the video.
-			msg.channel.sendMessage(wrap('Now Playing: ' + video.title)).then(() => {
+			msg.channel.send({embed: {
+			color: 3447003,
+			author: {
+				name: msg.author.user,
+				icon_url: msg.author.avatarURL
+			},
+			title: `${msg.author.username}`,
+			url: `${video.webpage_url}`,
+			description: `has requested a song`,
+			fields: [{
+					name: "Now playing",
+					value: `**${video.title}**`
+				}],
+					timestamp: new Date(),
+			footer: {
+				icon_url: msg.author.avatarURL,
+				text: msg.author.username + ` is epic`
+			}
+		}
+	}).then(() => {
 				let dispatcher = connection.playStream(ytdl(video.webpage_url, {filter: 'audioonly'}), {seek: 0, volume: (DEFAULT_VOLUME/100)});
 
 				connection.on('error', (error) => {
@@ -402,7 +511,7 @@ module.exports = function (client, options) {
 
 /**
  * Wrap text in a code block and escape grave characters.
- * 
+ *
  * @param {string} text - The input text.
  * @returns {string} - The wrapped text.
  */

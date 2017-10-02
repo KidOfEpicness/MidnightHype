@@ -1,8 +1,7 @@
 # MidnightHype
 
 To install, all you have to do is copy through a Git Bash using this command inside your Git Bash: 
-```git
-git clone https://github.com/KidOfEpicness/MidnightHype.git```
+`git clone https://github.com/KidOfEpicness/MidnightHype.git`
 
 
 
